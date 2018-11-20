@@ -1,0 +1,33 @@
+/**
+/*  <%= "#{model.class_name}.h" %>
+/*
+/*  Generated at <%= Time.now.strftime('%d.%m.%y %H:%M') %>.
+/*
+ */
+
+#import <Foundation/Foundation.h>
+#import "MBase.h"
+
+<% model.has_one_properties.each do |p| %>
+@class <%= "#{p.class_type}" %>;
+<% end %>
+<% model.has_many_properties.each do |p| %>
+@class <%= "#{p.class_type}" %>;
+<% end %>
+
+
+@interface <%= "#{model.class_name}" %> : MBase <NSCopying, NSCoding>
+
+<% model.single_properties.each do |p| %>
+@property (strong, nonatomic) <%=p.class_type%> *<%=p.property%>;
+<% end %>
+
+<% model.has_one_properties.each do |p| %>
+@property (strong, nonatomic) <%=p.class_type%> *<%=p.property%>;
+<% end %>
+
+<% model.has_many_properties.each do |p| %>
+@property (strong, nonatomic) NSArray <<%=p.class_type%> *> *<%=p.property%>;
+<% end %>
+
+@end

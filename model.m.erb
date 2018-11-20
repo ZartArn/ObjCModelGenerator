@@ -1,0 +1,84 @@
+/**
+/*  <%= "#{model.class_name}.h" %>
+/*
+/*  Generated at <%= Time.now.strftime('%d.%m.%y %H:%M') %>.
+/*
+ */
+
+#import "<%= "#{model.class_name}.h" %>"
+<% model.has_one_properties.each do |p| %>
+#import "<%= "#{p.class_type}.h" %>"
+<% end %>
+<% model.has_many_properties.each do |p| %>
+#import "<%= "#{p.class_type}.h" %>"
+<% end %>
+
+@implementation <%= "#{model.class_name}" %>
+
+/// cascade init
+- (instancetype)init {
+    if (self = [super init]) {
+        <% model.has_one_properties.each do |p| %>
+        _<%= p.property %> = [<%= p.class_type %> new];
+        <% end %>
+    }
+    return self;
+}
+
+#pragma mark - EKMappingProtocol
+
++ (EKObjectMapping *)objectMapping {
+    
+    EKObjectMapping *mapping = [super objectMapping];
+    
+    [mapping mapPropertiesFromDictionary:@{
+                                    <% model.single_properties.each do |p| %>
+                                           @"<%= p.key_path %>" : @"<%= p.property %>",
+                                    <% end %>
+                                           }];
+
+    <% model.has_one_properties.each do |p| %>
+    [mapping hasOne:[<%= p.class_type %> class] forKeyPath:@"<%= p.key_path %>" forProperty:@"<%= p.property %>"];
+    <% end %>
+
+    <% model.has_many_properties.each do |p| %>
+    [mapping hasMany:[<%= p.class_type %> class] forKeyPath:@"<%= p.key_path %>" forProperty:@"<%= p.property %>"];
+    <% end %>
+
+    return mapping;
+}
+
+
+#pragma mark - NSCopying
+
+- (id)copyWithZone:(NSZone *)zone {
+    NSData *buffer;
+    buffer = [NSKeyedArchiver archivedDataWithRootObject:self];
+    <%="#{model.class_name}"%> *copy = [NSKeyedUnarchiver unarchiveObjectWithData:buffer];
+    return copy;
+}
+
+#pragma mark - NSCoding
+
+- (id)initWithCoder:(NSCoder *)decoder {
+    if (self = [super init]) {
+        <% model.single_properties.each do |p| %>
+        self.<%= p.property %> = [decoder decodeObjectForKey:@"<%= p.property %>"];
+        <% end %>
+        <% model.has_one_properties.each do |p| %>
+        self.<%= p.property %> = [decoder decodeObjectForKey:@"<%= p.property %>"];
+        <% end %>
+        <% model.has_many_properties.each do |p| %>
+        self.<%= p.property %> = [decoder decodeObjectForKey:@"<%= p.property %>"];
+        <% end %>
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)encoder {
+    <% model.single_properties.each do |p| %>
+    [encoder encodeObject:_<%= p.property %> forKey:@"<%= p.property %>"];
+    <% end %>
+}
+
+@end
