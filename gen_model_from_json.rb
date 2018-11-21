@@ -7,8 +7,15 @@ def check_date_str(date_str)
   return true
 rescue ArgumentError
   false
-  # although, in my case I felt that logging this error and raising exception was a better approach, since we are forwarding this to the user of our API.
-  # log_and_raise_error("Given argument is not a valid ISO8601 date: '#{date}'")
+end
+
+class String
+  def camelize(lower = 0)
+    string = self
+    string = string.split('_').collect(&:capitalize).join
+    string = string[0].downcase + string[1..-1] if lower == 1
+    string
+  end
 end
 
 class MProperty
@@ -66,26 +73,26 @@ class ModelGenerator
         inner_json = value.first
         if inner_json.is_a? Hash
           object = AbstractModel.new
-          object.class_name = "#{@class_prefix}#{key}"
-          object.property = key[0].downcase + key[1..-1]
+          object.class_name = "#{@class_prefix}#{key.camelize}"
+          object.property = key.camelize(1)
           object.key_path = key
           parent.has_many_properties << parse(inner_json, object)
         else
           property = ModelProperty.new
-          property.name = key[0].downcase + key[1..-1]
+          property.name = key.camelize(1)
           property.key_path = key
           property.value = [inner_json]
           parent.single_properties << property
         end
       elsif value.is_a? Hash
         object = AbstractModel.new
-        object.class_name = "#{@class_prefix}#{key}"
-        object.property = key[0].downcase + key[1..-1]
+        object.class_name = "#{@class_prefix}#{key.camelize}"
+        object.property = key.camelize(1)
         object.key_path = key
         parent.has_one_properties << parse(value, object)
       else
         property = ModelProperty.new
-        property.name = key[0].downcase + key[1..-1]
+        property.name = key.camelize(1)
         property.key_path = key
         property.value = value
         parent.single_properties << property
