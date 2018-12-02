@@ -79,6 +79,12 @@
     <% model.single_properties.each do |p| %>
     [encoder encodeObject:_<%= p.property %> forKey:@"<%= p.property %>"];
     <% end %>
+    <% model.has_one_properties.each do |p| %>
+    [encoder encodeObject:_<%= p.property %> forKey:@"<%= p.property %>"];
+    <% end %>
+    <% model.has_many_properties.each do |p| %>
+    [encoder encodeObject:_<%= p.property %> forKey:@"<%= p.property %>"];
+    <% end %>
 }
 
 @end
